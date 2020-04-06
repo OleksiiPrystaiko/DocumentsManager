@@ -1,3 +1,4 @@
+using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -32,6 +33,8 @@ namespace DocumentsManager.API
               .ToArray();
 
             services.AddMediatR(moduleAssemblies);
+
+            services.AddAutoMapper(moduleAssemblies);
 
             services.AddSwaggerGen(c =>
             {

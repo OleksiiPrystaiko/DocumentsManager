@@ -1,6 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
-using DocumentsManager.Queries;
+using AutoMapper;
+using DocumentsManager.API.Request;
+using DocumentsManager.Commands.Documents;
+using DocumentsManager.DocumentsManager.Cqrs;
+using DocumentsManager.Queries.Documents;
+using DocumentsManager.Queries.HandlerResult;
+using DocumentsManager.Queries.Handlers;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,11 +21,14 @@ namespace DocumentsManager.API.Controllers
     {
         private readonly IMediator mediator;
 
+        private readonly IMapper mapper;
+
         private readonly ILogger<DocumentsController> logger;
 
-        public DocumentsController(IMediator mediator, ILogger<DocumentsController> logger)
+        public DocumentsController(IMediator mediator, IMapper mapper, ILogger<DocumentsController> logger)
         {
             this.mediator = mediator;
+            this.mapper = mapper;
             this.logger = logger;
         }
 
@@ -26,19 +36,28 @@ namespace DocumentsManager.API.Controllers
         public async Task<IActionResult> UploadDocuments(ICollection<IFormFile> files)
         {
             // TODO: Add ommand handlers separate project
-            var query = new DocumentsDownloadQuery($"{files.Count}");
+            var uploadCommand = new DocumentsUploadCommand(files);
+            await this.mediator.Send(uploadCommand);
+
+            return this.Ok();
+        }
+
+        [HttpGet("{documentName}")]
+        public async Task<IActionResult> DownloadDocument(string fileName)
+        {
+            var query = new DocumentDownloadQuery(fileName);
             var result = await this.mediator.Send(query);
 
             return this.Send(result);
         }
 
-        [HttpPost("download")]
-        public async Task<IActionResult> DownloadDocuments(IFormFile file)
+        [HttpPost("getAll")]
+        [ProducesResponseType(typeof(DataHandlerResult<GetDocumentsResult>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(NotFoundHandlerResult), (int)HttpStatusCode.NotFound)]
+        public Task<IHandlerResult> GetDocuments([FromBody]GetDocumentsRequest request)
         {
-            var query = new DocumentsDownloadQuery(file.ContentType);
-            var result = await this.mediator.Send(query);
-
-            return this.Send(result);
+            GetDocumentsQuery query = new GetDocumentsQuery(this.mapper.Map<GetDocumentsParameters>(request));
+            return this.mediator.Send(query);
         }
     }
 }

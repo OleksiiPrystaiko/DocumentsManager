@@ -1,9 +1,6 @@
 ﻿using DocumentsManager.DocumentsManager.Cqrs;
 using DocumentsManager.Queries.HandlerResult;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 

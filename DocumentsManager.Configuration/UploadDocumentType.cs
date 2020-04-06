@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace DocumentsManager.Configuration
+﻿namespace DocumentsManager.Configuration
 {
     public enum UploadDocumentType
     {

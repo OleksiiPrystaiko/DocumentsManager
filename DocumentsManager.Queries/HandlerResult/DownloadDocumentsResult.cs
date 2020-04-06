@@ -1,7 +1,4 @@
-﻿using DocumentsManager.DocumentsManager.Cqrs;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace DocumentsManager.Queries.HandlerResult
 {
